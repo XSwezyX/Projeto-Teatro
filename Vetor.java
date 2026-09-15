@@ -17,6 +17,9 @@ public class Vetor<T> {
         else
             return false;
     }
+    public boolean isFull() {
+    return size == capacity;
+}
 
     public int size() {
         return size;

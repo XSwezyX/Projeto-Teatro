@@ -15,7 +15,7 @@ public class Teatro {
 
     public Teatro() {
         espetaculos = new Vetor<Espetaculo>(20);
-        reservas = new Vetor<Reserva>(800);
+        reservas = new Vetor<Reserva>(400);
         entrada = new Scanner(System.in);
         dadosCarregados = false;
     }
@@ -126,8 +126,8 @@ public class Teatro {
         }
 
         if (reservas.isFull()) {
-            System.out.println("Limite de reservas atingido.");
-            return;
+         System.out.println("Limite de reservas atingido.");
+             return;
         }
 
         System.out.println("\n" + espetaculo.getCodigo() + " - " + espetaculo.getNome() + " - " + espetaculo.getData() + " - " + espetaculo.getHorario());
