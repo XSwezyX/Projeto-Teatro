@@ -1,5 +1,3 @@
-package Teatro;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -268,7 +266,31 @@ public class Teatro{
             System.out.println("\n=== ESTATÍSTICAS ===");
            exibirEspetaculoMaisPovo();
             exibirEspetaculoMaisArrecadou();
+            exibirMedia();
+
     }
+    private void exibirMedia(){
+        if (!verificarCarga()) {
+            return;
+        }
+    
+        double totalVendas = 0;
+    
+        for (int indice = 0; indice < espetaculos.size(); indice++) {
+            try {
+                Espetaculo espetaculo = espetaculos.get(indice);
+                int assentosOcupados = espetaculo.quantidadeAssentosOcupados();
+                double arrecadacao = assentosOcupados * espetaculo.getPreco();
+                totalVendas += arrecadacao;
+            } catch (Exception e) {
+                System.out.println("Erro ao calcular média de vendas.");
+            }
+        }
+    
+        double mediaVendas = totalVendas / espetaculos.size();
+        System.out.printf(Locale.US, "Média de vendas de todos os espetáculos: R$ %.2f%n", mediaVendas);
+    }
+
     private void exibirEspetaculoMaisPovo() {
     if (!verificarCarga()) {
         return;
@@ -295,6 +317,7 @@ public class Teatro{
     if (maisPovo != null) {
         System.out.println("\nEspetáculo com mais público: " + maisPovo.getNome());
         System.out.println("Assentos ocupados: " + maiorOcupacao + " de 40");
+        System.out.println("---------------------");
     }
 }
 
@@ -324,8 +347,12 @@ private void exibirEspetaculoMaisArrecadou() {
     if (maisArrecadou != null) {
         System.out.printf("Espetáculo que mais arrecadou: " + maisArrecadou.getNome() + "\n");
         System.out.printf("Arrecadação: R$ %.2f%n", maiorArrecadacao);
+        System.out.println("---------------------");
     }
+
 }
+
+
     private int lerInteiro(String mensagem) {
         while (true) {
             String texto = lerTexto(mensagem);
