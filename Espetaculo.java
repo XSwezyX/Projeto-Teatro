@@ -1,4 +1,4 @@
-
+package Teatro;
 
 public class Espetaculo {
     private int codigo;
@@ -69,6 +69,21 @@ public class Espetaculo {
         }
 
         return livres;
+    }
+
+    public int quantidadeAssentosOcupados(){
+         
+        int ocupados = 0;
+
+        for (int linha = 0; linha < assentos.length; linha++) {
+            for (int coluna = 0; coluna < assentos[linha].length; coluna++) {
+                if (assentos[linha][coluna] == 'X') {
+                    ocupados++;
+                }
+            }
+        }
+
+        return ocupados;
     }
 
     public void exibirMapa() {
