@@ -1,4 +1,4 @@
-
+package Teatro;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class Teatro {
+public class Teatro{
     private Vetor<Espetaculo> espetaculos;
     private Vetor<Reserva> reservas;
     private Scanner entrada;
@@ -15,7 +15,7 @@ public class Teatro {
 
     public Teatro() {
         espetaculos = new Vetor<Espetaculo>(20);
-        reservas = new Vetor<Reserva>(400);
+        reservas = new Vetor<Reserva>(800);
         entrada = new Scanner(System.in);
         dadosCarregados = false;
     }
@@ -38,7 +38,13 @@ public class Teatro {
                 exibirEspetaculos();
             } else if (opcao == 3) {
                 fazerReserva();
-            } else if (opcao != 7) {
+            } else if (opcao == 4){
+                exibirMapa();
+            }else if (opcao == 5){
+                exibirReserva();
+            }else if (opcao == 6){
+                exibirEstatisticas();
+            }else if (opcao != 7) {
                 System.out.println("Opcao invalida.");
             }
         } while (opcao != 7);
@@ -50,6 +56,9 @@ public class Teatro {
         System.out.println("\n1. Carregar espetaculos");
         System.out.println("2. Exibir espetaculos");
         System.out.println("3. Fazer reserva");
+        System.out.println("4. Consultar mapa de assentos");
+        System.out.println("5. Consultar reserva");
+        System.out.println("6. Estatísticas");
         System.out.println("7. Sair");
     }
 
@@ -126,8 +135,8 @@ public class Teatro {
         }
 
         if (reservas.isFull()) {
-         System.out.println("Limite de reservas atingido.");
-             return;
+            System.out.println("Limite de reservas atingido.");
+            return;
         }
 
         System.out.println("\n" + espetaculo.getCodigo() + " - " + espetaculo.getNome() + " - " + espetaculo.getData() + " - " + espetaculo.getHorario());
@@ -157,6 +166,34 @@ public class Teatro {
         }
     }
 
+        public void exibirMapa(){
+         if (!verificarCarga()) {
+            return;
+        }
+        int codigo = lerInteiro("Codigo do espetaculo: ");
+        Espetaculo espetaculo = buscarEspetaculo(codigo);
+        if (espetaculo == null) {
+            System.out.println("Espetaculo nao encontrado.");
+            return;
+        }
+         System.out.println("\nMapa de assentos:");
+        espetaculo.exibirMapa();
+
+}
+  public void exibirReserva(){
+    try {
+        String cpf = lerTexto("Cpf:");
+        Reserva reserva = buscarReserva(cpf);
+        if(reserva == null){
+            System.out.println("Reserva não encontrada");
+            return;
+        }
+        exibirResumoReserva(reserva);
+    } catch (Exception e) {
+        System.out.println("Erro ao buscar a reserva.");
+    }
+}
+
     private boolean verificarCarga() {
         if (!dadosCarregados) {
             System.out.println("Carregue os espetaculos antes de usar esta opcao.");
@@ -181,7 +218,17 @@ public class Teatro {
 
         return null;
     }
-
+ 
+    private Reserva buscarReserva(String cpf) throws Exception {
+        for(int indice = 0; indice < reservas.size(); indice++){
+            Reserva reserva =  reservas.get(indice);
+            
+        if(reserva.getCpf().equals(cpf)){
+            return reserva;
+            }
+        }
+        return null;
+    }
     private String selecionarAssento(Espetaculo espetaculo, int numeroAssento) {
         while (true) {
             String assento = lerTexto("Assento " + numeroAssento + ": ").toUpperCase();
@@ -205,7 +252,6 @@ public class Teatro {
     }
 
     private void exibirResumoReserva(Reserva reserva) {
-        System.out.println("\nReserva realizada!");
         System.out.println("Espetaculo: " + reserva.getEspetaculo().getNome());
         System.out.print("Assentos: ");
 
@@ -218,13 +264,75 @@ public class Teatro {
         System.out.printf(Locale.US, "Valor total: R$ %.2f%n", reserva.getEspetaculo().getPreco() * reserva.getQtdeAssentos());
     }
 
+    private void exibirEstatisticas(){
+            System.out.println("\n=== ESTATÍSTICAS ===");
+           exibirEspetaculoMaisPovo();
+            exibirEspetaculoMaisArrecadou();
+    }
+    private void exibirEspetaculoMaisPovo() {
+    if (!verificarCarga()) {
+        return;
+    }
+    
+    Espetaculo maisPovo = null;
+    int maiorOcupacao = -1;
+    
+    
+    for (int indice = 0; indice < espetaculos.size(); indice++) {
+        try {
+            Espetaculo espetaculo = espetaculos.get(indice);
+            int ocupados = espetaculo.quantidadeAssentosOcupados();
+            
+            if (ocupados > maiorOcupacao) {
+                maiorOcupacao = ocupados;
+                maisPovo = espetaculo;
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao calcular estatísticas.");
+        }
+    }
+    
+    if (maisPovo != null) {
+        System.out.println("\nEspetáculo com mais público: " + maisPovo.getNome());
+        System.out.println("Assentos ocupados: " + maiorOcupacao + " de 40");
+    }
+}
+
+private void exibirEspetaculoMaisArrecadou() {
+    if (!verificarCarga()) {
+        return;
+    }
+    
+    Espetaculo maisArrecadou = null;
+    double maiorArrecadacao = 0;
+ 
+    for (int indice = 0; indice < espetaculos.size(); indice++) {
+        try {
+            Espetaculo espetaculo = espetaculos.get(indice);
+            int ocupados = espetaculo.quantidadeAssentosOcupados();
+            double arrecadacao = ocupados * espetaculo.getPreco();
+            
+            if (arrecadacao > maiorArrecadacao) {
+                maiorArrecadacao = arrecadacao;
+                maisArrecadou = espetaculo;
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao calcular estatísticas.");
+        }
+    }
+    
+    if (maisArrecadou != null) {
+        System.out.printf("Espetáculo que mais arrecadou: " + maisArrecadou.getNome() + "\n");
+        System.out.printf("Arrecadação: R$ %.2f%n", maiorArrecadacao);
+    }
+}
     private int lerInteiro(String mensagem) {
         while (true) {
             String texto = lerTexto(mensagem);
 
             try {
                 return Integer.parseInt(texto);
-            } catch (NumberFormatException e) {
+             } catch (NumberFormatException e) {
                 System.out.println("Digite um numero inteiro valido.");
             }
         }
